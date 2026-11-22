@@ -63,3 +63,36 @@ function preencherVazio() {
     }
 }
 
+function desenharLista() {
+  const lista = document.getElementById("lista-palavras");
+  lista.innerHTML = "";
+  palavras.forEach(p => {
+    const span = document.createElement("span");
+    span.className = "palavra";
+    span.id = "palavra-" + p;
+    span.textContent = p;
+    lista.appendChild(span);
+  });
+}
+
+function desenharGrade() {
+  const el = document.getElementById("cruzada");
+  el.innerHTML = "";
+  el.style.setProperty("--colunas", TAMANHO);
+
+  for (let l = 0; l < TAMANHO; l++) {
+    for (let c = 0; c < TAMANHO; c++) {
+      const div = document.createElement("div");
+      div.className = "celula";
+      div.textContent = grade[l][c];
+      div.dataset.l = l;
+      div.dataset.c = c;
+      div.addEventListener("click", () => aoClicar(l, c));
+      el.appendChild(div);
+    }
+  }
+}
+
+function pegarCelula(l, c) {
+  return document.querySelector(`.celula[data-l="${l}"][data-c="${c}"]`);
+}
