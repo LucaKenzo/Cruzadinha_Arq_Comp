@@ -25,6 +25,29 @@ function criarCruzada() {
     }
 }
 
-function colocarPalavras() {
+function podeColocar(palavra, l, c, dl, dc) {
+    for (let i = 0; i < palavra.lenght; i++) {
+        const linha = l + dl * i;
+        const coluna = c + dc * i;
+
+        if (linha < 0 || linha >= tamanho || coluna < 0 || coluna >= tamanho) return false;
+        if (cruzada[linha][coluna] !== "" && cruzada[linha][coluna] !== palavra[i]) return false;
+    }
+    return true;
+}
+
+function colocarPalavras(palavra) {
+    for (let tentativa = 0; tentativa < 300; tentativa++) {
+        const [dl, dc] = direcoes[Math.floor(Math.random * direcoes.length)]
+        const l = Math.floor(Math.random * tamanho);
+        const c = Math.floor(Math.random * tamanho);
     
+        if (podeColocar(palavra, l, c, dl, dc)) {
+            for (let i = 0; i < palavra.lenght; i ++) {
+                cruzada[l + dl * i][c + dc * i] = palavra[i];
+            }
+            return true;
+        }
+    }
+    return false;
 }
