@@ -96,3 +96,51 @@ function desenharGrade() {
 function pegarCelula(l, c) {
   return document.querySelector(`.celula[data-l="${l}"][data-c="${c}"]`);
 }
+
+function aoClicar(l, c) {
+  // 1º clique: só marca a célula
+  if (!primeiraCelula) {
+    primeiraCelula = { l, c };
+    pegarCelula(l, c).classList.add("selecionada");
+    return;
+  }
+
+  // 2º clique: tenta validar
+  const { l: l1, c: c1 } = primeiraCelula;
+  pegarCelula(l1, c1).classList.remove("selecionada");
+  primeiraCelula = null;
+
+  const difL = l - l1;
+  const difC = c - c1;
+
+  // Só vale linha reta: horizontal, vertical ou diagonal
+  const valido = difL === 0 || difC === 0 || Math.abs(difL) === Math.abs(difC);
+  if (!valido) return;
+
+  const passos = Math.max(Math.abs(difL), Math.abs(difC));
+  const dl = Math.sign(difL);
+  const dc = Math.sign(difC);
+
+  let texto = "";
+  const caminho = [];
+  for (let i = 0; i <= passos; i++) {
+    const nl = l1 + dl * i;
+    const nc = c1 + dc * i;
+    texto += grade[nl][nc];
+    caminho.push([nl, nc]);
+  }
+
+  const invertido = texto.split("").reverse().join("");
+  const achou = palavras.find(p => p === texto || p === invertido);
+
+  if (achou && !encontradas.has(achou)) {
+    encontradas.add(achou);
+    caminho.forEach(([cl, cc]) => pegarCelula(cl, cc).classList.add("achada"));
+    document.getElementById("palavra-" + achou).classList.add("riscada");
+
+    if (encontradas.size === palavras.length) {
+      document.getElementById("mensagem").textContent =
+        "Parabéns! Você encontrou todas as palavras!";
+    }
+  }
+}
