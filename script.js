@@ -16,3 +16,15 @@ const direcoes = [
   [-1, -1], 
   [1, -1]   
 ];
+
+function criarCruzada() {
+    let cruzada = [];
+
+    for (let i = 0; i < tamanho; i++) {
+        cruzada.push(Array(tamanho).fill(""));
+    }
+}
+
+function colocarPalavras() {
+    
+}
