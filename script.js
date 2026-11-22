@@ -51,3 +51,15 @@ function colocarPalavras(palavra) {
     }
     return false;
 }
+
+function preencherVazio() {
+    const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for (let l = 0; l < tamanho; l++){
+        for (let c = 0; c < tamanho; c++) {
+            if (cruzada[l][c] == "") {
+                cruzada[l][c] = alfabeto[Math.floor(Math.random() * alfabeto.length)];
+            }
+        }
+    }
+}
+
