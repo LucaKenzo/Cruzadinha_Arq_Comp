@@ -1,161 +1,364 @@
+const LINHAS = 16;
+const COLUNAS = 16;
+
 const palavras = [
-  "CPU", "ULA", "REGISTRADORES", "RAM", "ROM", "EPROM", "FLASH", "MASSA",
-  "DMA", "CHIPSELECT", "ADRESSBUS", "DATABUS", "INTELCINCO", "INTELSETE",
-  "DUALCORE", "QUADCORE"
+  { resposta: "MICROCONTROLADOR", linha: 6,  coluna: 0,  direcao: "H",
+    pista: "Chip único com processador, memória e portas de entrada e saída, usado em Arduino." },
+  { resposta: "REGISTRADORES",    linha: 0,  coluna: 15, direcao: "V",
+    pista: "Pequenas memórias dentro do processador, as mais rápidas de todas." },
+  { resposta: "MEMORIADEMASSA",   linha: 2,  coluna: 3,  direcao: "V",
+    pista: "Guarda grandes volumes de dados de forma permanente, como HD ou SSD." },
+  { resposta: "ADDRESSBUS",       linha: 4,  coluna: 13, direcao: "V",
+    pista: "Via que carrega a posição da memória que será lida ou escrita." },
+  { resposta: "DUALCORE",         linha: 12, coluna: 1,  direcao: "H",
+    pista: "Processador com dois núcleos de execução no mesmo chip." },
+  { resposta: "QUADCORE",         linha: 0,  coluna: 9,  direcao: "V",
+    pista: "Processador com quatro núcleos de execução no mesmo chip." },
+  { resposta: "DATABUS",          linha: 10, coluna: 7,  direcao: "H",
+    pista: "Via por onde trafegam os valores lidos e escritos entre processador e memória." },
+  { resposta: "EEPROM",           linha: 2,  coluna: 6,  direcao: "V",
+    pista: "Memória não volátil regravável por sinais elétricos, com escrita e apagamento byte a byte." },
+  { resposta: "CPU",              linha: 12, coluna: 5,  direcao: "V",
+    pista: "Chip que busca, decodifica e executa as instruções dos programas." },
+  { resposta: "ROM",              linha: 2,  coluna: 1,  direcao: "H",
+    pista: "Memória não volátil gravada na fabricação, cujo conteúdo normalmente não é alterado." },
+  { resposta: "DMA",              linha: 8,  coluna: 10, direcao: "V",
+    pista: "Técnica que permite a periféricos trocar dados com a memória sem ocupar o processador." },
+  { resposta: "CACHE",            linha: 2,  coluna: 8,  direcao: "H",
+    pista: "Memória veloz entre processador e memória principal que guarda cópias de dados frequentes." },
+  { resposta: "FLASH",            linha: 8,  coluna: 1,  direcao: "H",
+    pista: "Memória não volátil regravável por blocos, usada em pen drives e cartões de memória." },
+  { resposta: "ULA",              linha: 5,  coluna: 11, direcao: "V",
+    pista: "Circuito do processador que faz as contas e as comparações lógicas." },
+  { resposta: "UC",               linha: 4,  coluna: 8,  direcao: "H",
+    pista: "Parte do processador que interpreta instruções e envia sinais de comando aos outros blocos." },
+  { resposta: "RAM",              linha: 15, coluna: 2,  direcao: "H",
+    pista: "Memória volátil onde ficam programas e dados em uso; perde tudo sem energia." }
 ];
 
-const tamanho = 22;
-
-const direcoes = [
-  [0, 1],   
-  [1, 0],   
-  [1, 1],   
-  [-1, 1],  
-  [0, -1],  
-  [-1, 0],  
-  [-1, -1], 
-  [1, -1]   
-];
-
-function criarCruzada() {
-    let cruzada = [];
-
-    for (let i = 0; i < tamanho; i++) {
-        cruzada.push(Array(tamanho).fill(""));
-    }
+function chave(l, c) {
+  return l + "," + c;
 }
 
-function podeColocar(palavra, l, c, dl, dc) {
-    for (let i = 0; i < palavra.lenght; i++) {
-        const linha = l + dl * i;
-        const coluna = c + dc * i;
-
-        if (linha < 0 || linha >= tamanho || coluna < 0 || coluna >= tamanho) return false;
-        if (cruzada[linha][coluna] !== "" && cruzada[linha][coluna] !== palavra[i]) return false;
-    }
-    return true;
+function posicoesDaPalavra(p) {
+  const lista = [];
+  for (let i = 0; i < p.resposta.length; i++) {
+    const l = p.linha + (p.direcao === "V" ? i : 0);
+    const c = p.coluna + (p.direcao === "H" ? i : 0);
+    lista.push([l, c]);
+  }
+  return lista;
 }
 
-function colocarPalavras(palavra) {
-    for (let tentativa = 0; tentativa < 300; tentativa++) {
-        const [dl, dc] = direcoes[Math.floor(Math.random * direcoes.length)]
-        const l = Math.floor(Math.random * tamanho);
-        const c = Math.floor(Math.random * tamanho);
-    
-        if (podeColocar(palavra, l, c, dl, dc)) {
-            for (let i = 0; i < palavra.lenght; i ++) {
-                cruzada[l + dl * i][c + dc * i] = palavra[i];
-            }
-            return true;
-        }
-    }
-    return false;
-}
+function calcularNumeros(lista) {
+  const inicios = new Set(lista.map(p => chave(p.linha, p.coluna)));
+  const ordenados = [...inicios]
+    .map(k => k.split(",").map(Number))
+    .sort((a, b) => a[0] - b[0] || a[1] - b[1]);
 
-function preencherVazio() {
-    const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    for (let l = 0; l < tamanho; l++){
-        for (let c = 0; c < tamanho; c++) {
-            if (cruzada[l][c] == "") {
-                cruzada[l][c] = alfabeto[Math.floor(Math.random() * alfabeto.length)];
-            }
-        }
-    }
-}
+  const numeros = {};
+  ordenados.forEach(([l, c], i) => {
+    numeros[chave(l, c)] = i + 1;
+  });
 
-function desenharLista() {
-  const lista = document.getElementById("lista-palavras");
-  lista.innerHTML = "";
-  palavras.forEach(p => {
-    const span = document.createElement("span");
-    span.className = "palavra";
-    span.id = "palavra-" + p;
-    span.textContent = p;
-    lista.appendChild(span);
+  lista.forEach(p => {
+    p.numero = numeros[chave(p.linha, p.coluna)];
   });
 }
 
-function desenharGrade() {
-  const el = document.getElementById("cruzada");
-  el.innerHTML = "";
-  el.style.setProperty("--colunas", TAMANHO);
+const tabuleiro = document.getElementById("tabuleiro");
+const listaH = document.getElementById("pistas-horizontais");
+const listaV = document.getElementById("pistas-verticais");
+const contador = document.getElementById("contador");
+const mensagem = document.getElementById("mensagem");
 
-  for (let l = 0; l < TAMANHO; l++) {
-    for (let c = 0; c < TAMANHO; c++) {
+const celulas = {};
+let direcaoAtual = "H";
+let ativa = null;
+
+function montarModelo() {
+  palavras.forEach(p => {
+    posicoesDaPalavra(p).forEach(([l, c], i) => {
+      const k = chave(l, c);
+      if (!celulas[k]) {
+        celulas[k] = { solucao: p.resposta[i], palavras: { H: null, V: null } };
+      }
+      celulas[k].palavras[p.direcao] = p;
+      if (i === 0) celulas[k].numero = p.numero;
+    });
+  });
+}
+
+function desenharTabuleiro() {
+  tabuleiro.innerHTML = "";
+  tabuleiro.style.setProperty("--colunas", COLUNAS);
+
+  for (let l = 0; l < LINHAS; l++) {
+    for (let c = 0; c < COLUNAS; c++) {
+      const cel = celulas[chave(l, c)];
       const div = document.createElement("div");
+
+      if (!cel) {
+        div.className = "bloco";
+        tabuleiro.appendChild(div);
+        continue;
+      }
+
       div.className = "celula";
-      div.textContent = grade[l][c];
-      div.dataset.l = l;
-      div.dataset.c = c;
-      div.addEventListener("click", () => aoClicar(l, c));
-      el.appendChild(div);
+
+      if (cel.numero) {
+        const n = document.createElement("span");
+        n.className = "numero";
+        n.textContent = cel.numero;
+        div.appendChild(n);
+      }
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.maxLength = 1;
+      input.autocomplete = "off";
+      input.autocapitalize = "characters";
+      input.spellcheck = false;
+      input.setAttribute("aria-label", "Linha " + (l + 1) + ", coluna " + (c + 1));
+
+      let jaEstavaAtiva = false;
+      input.addEventListener("mousedown", () => {
+        jaEstavaAtiva = ativa && ativa.l === l && ativa.c === c && document.activeElement === input;
+      });
+      input.addEventListener("click", () => {
+        if (jaEstavaAtiva && cel.palavras.H && cel.palavras.V) {
+          direcaoAtual = direcaoAtual === "H" ? "V" : "H";
+          destacar();
+        }
+      });
+      input.addEventListener("focus", () => aoFocar(l, c));
+      input.addEventListener("input", () => aoDigitar(l, c));
+      input.addEventListener("keydown", e => aoTeclar(e, l, c));
+
+      div.appendChild(input);
+      cel.div = div;
+      cel.input = input;
+      tabuleiro.appendChild(div);
     }
   }
 }
 
-function pegarCelula(l, c) {
-  return document.querySelector(`.celula[data-l="${l}"][data-c="${c}"]`);
+function desenharPistas() {
+  const ordenadas = [...palavras].sort((a, b) => a.numero - b.numero);
+
+  ordenadas.forEach(p => {
+    const li = document.createElement("li");
+    li.tabIndex = 0;
+
+    const num = document.createElement("strong");
+    num.textContent = p.numero + ". ";
+
+    const texto = document.createElement("span");
+    texto.textContent = p.pista + " (" + p.resposta.length + ")";
+
+    const status = document.createElement("span");
+    status.className = "status";
+
+    li.append(num, texto, status);
+
+    const selecionar = () => {
+      direcaoAtual = p.direcao;
+      const [l, c] = posicoesDaPalavra(p)[0];
+      irPara(l, c);
+      destacar();
+    };
+    li.addEventListener("click", selecionar);
+    li.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        selecionar();
+      }
+    });
+
+    p.li = li;
+    (p.direcao === "H" ? listaH : listaV).appendChild(li);
+  });
 }
 
-function aoClicar(l, c) {
-  // 1º clique: só marca a célula
-  if (!primeiraCelula) {
-    primeiraCelula = { l, c };
-    pegarCelula(l, c).classList.add("selecionada");
+function irPara(l, c) {
+  const cel = celulas[chave(l, c)];
+  if (!cel) return false;
+  cel.input.focus();
+  return true;
+}
+
+function andar(l, c, passo) {
+  const nl = l + (direcaoAtual === "V" ? passo : 0);
+  const nc = c + (direcaoAtual === "H" ? passo : 0);
+  return irPara(nl, nc);
+}
+
+function aoFocar(l, c) {
+  ativa = { l, c };
+  const cel = celulas[chave(l, c)];
+
+  if (!cel.palavras[direcaoAtual]) {
+    direcaoAtual = direcaoAtual === "H" ? "V" : "H";
+  }
+  destacar();
+  setTimeout(() => cel.input.select(), 0);
+}
+
+function limparCasa(cel) {
+  cel.div.classList.remove("certa", "errada");
+}
+
+function aoTeclar(e, l, c) {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const cel = celulas[chave(l, c)];
+
+  const setas = {
+    ArrowRight: ["H", 0, 1],
+    ArrowLeft: ["H", 0, -1],
+    ArrowDown: ["V", 1, 0],
+    ArrowUp: ["V", -1, 0]
+  };
+
+  if (setas[e.key]) {
+    e.preventDefault();
+    const [d, dl, dc] = setas[e.key];
+    if (cel.palavras[d]) direcaoAtual = d;
+    if (!irPara(l + dl, c + dc)) destacar();
     return;
   }
 
-  // 2º clique: tenta validar
-  const { l: l1, c: c1 } = primeiraCelula;
-  pegarCelula(l1, c1).classList.remove("selecionada");
-  primeiraCelula = null;
-
-  const difL = l - l1;
-  const difC = c - c1;
-
-  // Só vale linha reta: horizontal, vertical ou diagonal
-  const valido = difL === 0 || difC === 0 || Math.abs(difL) === Math.abs(difC);
-  if (!valido) return;
-
-  const passos = Math.max(Math.abs(difL), Math.abs(difC));
-  const dl = Math.sign(difL);
-  const dc = Math.sign(difC);
-
-  let texto = "";
-  const caminho = [];
-  for (let i = 0; i <= passos; i++) {
-    const nl = l1 + dl * i;
-    const nc = c1 + dc * i;
-    texto += grade[nl][nc];
-    caminho.push([nl, nc]);
+  if (e.key === "Backspace") {
+    if (cel.input.value === "") {
+      e.preventDefault();
+      if (andar(l, c, -1)) {
+        const anterior = celulas[chave(ativa.l, ativa.c)];
+        anterior.input.value = "";
+        limparCasa(anterior);
+      }
+    } else {
+      limparCasa(cel);
+    }
+    return;
   }
 
-  const invertido = texto.split("").reverse().join("");
-  const achou = palavras.find(p => p === texto || p === invertido);
-
-  if (achou && !encontradas.has(achou)) {
-    encontradas.add(achou);
-    caminho.forEach(([cl, cc]) => pegarCelula(cl, cc).classList.add("achada"));
-    document.getElementById("palavra-" + achou).classList.add("riscada");
-
-    if (encontradas.size === palavras.length) {
-      document.getElementById("mensagem").textContent =
-        "Parabéns! Você encontrou todas as palavras!";
+  if (e.key.length === 1) {
+    e.preventDefault();
+    if (/^[a-zA-Z]$/.test(e.key)) {
+      cel.input.value = e.key.toUpperCase();
+      limparCasa(cel);
+      andar(l, c, 1);
     }
+  }
+}
+
+function aoDigitar(l, c) {
+  const cel = celulas[chave(l, c)];
+  const v = cel.input.value
+    .normalize("NFD")
+    .replace(/[^A-Za-z]/g, "")
+    .toUpperCase()
+    .slice(-1);
+
+  cel.input.value = v;
+  limparCasa(cel);
+  if (v) andar(l, c, 1);
+}
+
+function destacar() {
+  Object.values(celulas).forEach(cel => {
+    cel.div.classList.remove("palavra-ativa", "celula-ativa");
+  });
+  palavras.forEach(p => p.li.classList.remove("ativa"));
+
+  if (!ativa) return;
+
+  const atual = celulas[chave(ativa.l, ativa.c)];
+  const p = atual.palavras[direcaoAtual];
+
+  if (p) {
+    posicoesDaPalavra(p).forEach(([l, c]) => {
+      celulas[chave(l, c)].div.classList.add("palavra-ativa");
+    });
+    p.li.classList.add("ativa");
+  }
+  atual.div.classList.add("celula-ativa");
+}
+
+function conferir() {
+  let certas = 0;
+  const casasCertas = new Set();
+
+  palavras.forEach(p => {
+    const posicoes = posicoesDaPalavra(p);
+    const digitado = posicoes
+      .map(([l, c]) => celulas[chave(l, c)].input.value)
+      .join("");
+    const acertou = digitado === p.resposta;
+
+    p.li.classList.remove("certa", "errada");
+    p.li.classList.add(acertou ? "certa" : "errada");
+    p.li.querySelector(".status").textContent = acertou ? " ✔" : " ✘";
+
+    if (acertou) {
+      certas++;
+      posicoes.forEach(([l, c]) => casasCertas.add(chave(l, c)));
+    }
+  });
+
+  Object.entries(celulas).forEach(([k, cel]) => {
+    limparCasa(cel);
+    if (casasCertas.has(k)) {
+      cel.div.classList.add("certa");
+    } else if (cel.input.value !== "" && cel.input.value !== cel.solucao) {
+      cel.div.classList.add("errada");
+    }
+  });
+
+  contador.textContent = certas + " de " + palavras.length + " palavras";
+
+  if (certas === palavras.length) {
+    mensagem.textContent = "Parabéns! Você completou a cruzadinha!";
+    mensagem.className = "ok";
+  } else {
+    const faltam = palavras.length - certas;
+    mensagem.textContent = faltam === 1
+      ? "Falta 1 palavra. Confira as marcadas com ✘."
+      : "Faltam " + faltam + " palavras. Confira as marcadas com ✘.";
+    mensagem.className = "";
+  }
+}
+
+function reiniciar() {
+  Object.values(celulas).forEach(cel => {
+    cel.input.value = "";
+    limparCasa(cel);
+  });
+
+  palavras.forEach(p => {
+    p.li.classList.remove("certa", "errada");
+    p.li.querySelector(".status").textContent = "";
+  });
+
+  contador.textContent = "0 de " + palavras.length + " palavras";
+  mensagem.textContent = "";
+  mensagem.className = "";
+  direcaoAtual = "H";
+  ativa = null;
+  destacar();
+  if (document.activeElement && document.activeElement.blur) {
+    document.activeElement.blur();
   }
 }
 
 function iniciar() {
-  criarGradeVazia();
+  calcularNumeros(palavras);
+  montarModelo();
+  desenharPistas();
+  desenharTabuleiro();
 
-  // Palavras maiores primeiro, fica mais fácil de encaixar
-  [...palavras]
-    .sort((a, b) => b.length - a.length)
-    .forEach(colocarPalavra);
-
-  preencherVazios();
-  desenharLista();
-  desenharGrade();
+  contador.textContent = "0 de " + palavras.length + " palavras";
+  document.getElementById("btn-conferir").addEventListener("click", conferir);
+  document.getElementById("btn-reiniciar").addEventListener("click", reiniciar);
 }
 
 iniciar();

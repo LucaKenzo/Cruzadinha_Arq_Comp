@@ -1,21 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <title>WordCore</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cruzadinha de Arquitetura Computacional</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <header>
+    <h1>Cruzadinha de Arquitetura Computacional</h1>
+    <p class="subtitulo">Leia a pista, descubra o termo e digite as letras direto nas casas.</p>
+  </header>
 
-    <h1>WordCore</h1>
-    <p class="subtitulo">Caça-palavras</p>
+  <main class="jogo">
+    <section class="area-tabuleiro">
+      <div id="tabuleiro" aria-label="Tabuleiro da cruzadinha"></div>
 
-    <div id="listaPalavras"></div>
-    <div id="cruzada"></div>
-    <div id="div_exibir"></div>
-    
-    <script src="script.js"></script>
+      <div class="controles">
+        <button id="btn-conferir" type="button">Conferir</button>
+        <button id="btn-reiniciar" type="button" class="secundario">Reiniciar</button>
+        <span id="contador" aria-live="polite">0 de 16 palavras</span>
+      </div>
+
+      <p id="mensagem" aria-live="polite"></p>
+      <p class="dica">Dica: clique de novo na casa selecionada (ou use as setas) para alternar entre horizontal e vertical. O número entre parênteses é a quantidade de letras.</p>
+    </section>
+
+    <aside class="area-pistas">
+      <h2>Horizontais</h2>
+      <ul id="pistas-horizontais"></ul>
+
+      <h2>Verticais</h2>
+      <ul id="pistas-verticais"></ul>
+    </aside>
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>
