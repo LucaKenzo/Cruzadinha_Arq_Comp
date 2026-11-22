@@ -13,7 +13,7 @@ h1 { margin-bottom: 4px; }
 .subtitulo { font-size: 13px; margin-top: 0; }
 
 /* Lista de palavras (as "pílulas" do topo) */
-#lista-palavras {
+#listaPalavras {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -36,7 +36,7 @@ h1 { margin-bottom: 4px; }
 }
 
 /* Grade de letras */
-#grade {
+#cruzada {
   display: grid;
   grid-template-columns: repeat(var(--colunas), 1fr);
   gap: 2px;
@@ -61,4 +61,4 @@ h1 { margin-bottom: 4px; }
 .celula.selecionada { background: #e0a800; color: #000; }
 .celula.achada { background: #2e9e5b; }
 
-#mensagem { font-size: 18px; font-weight: bold; color: #5fe39a; }
+#div_exibir { font-size: 18px; font-weight: bold; color: #5fe39a; }
