@@ -144,3 +144,18 @@ function aoClicar(l, c) {
     }
   }
 }
+
+function iniciar() {
+  criarGradeVazia();
+
+  // Palavras maiores primeiro, fica mais fácil de encaixar
+  [...palavras]
+    .sort((a, b) => b.length - a.length)
+    .forEach(colocarPalavra);
+
+  preencherVazios();
+  desenharLista();
+  desenharGrade();
+}
+
+iniciar();
